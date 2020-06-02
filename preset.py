@@ -15,7 +15,7 @@ _basic = {"obsc_l": 1,
           "prefix": "$s"}
 _pres = {}
 
-#Возвращение int из любой из библиотек
+#Возвращение int из любого типа
 def inta(typ, pre):
     try:
         return int(typ)

@@ -55,7 +55,7 @@ while True: #Запускаем бесконечный цикл
         longpoll = loc_a['server']
         print(longpoll)
         log("Got longpoll server!")
-    try: #Делаем интернет запрос с таймаутом в шесть и пять секунд (не спрашивайте)
+    try: #Делаем запрос с таймаутом в шесть и пять секунд (не спрашивайте)
         dd = eth_session.post(longpoll, {"ts": ts,
                                          "act": "a_check",
                                          "key": key,

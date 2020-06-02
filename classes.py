@@ -15,4 +15,26 @@ class Answer():
         if target != None:
             self.target = target
             
+class Cl_Action():
+    name = None
+    function = None
 
+    def N(self, func, name):
+        self.name = name
+        self.function = func
+        return self
+
+def Action(name, func): #Я не знаю как сделать мгновенную иницализацию.
+                        #TODO: Сделать так, как делают все нормальные люди
+    return Cl_Action().N(func, name)
+
+
+
+
+
+
+
+
+
+#END
+#Code by Oria
