@@ -57,6 +57,7 @@ def stop(message = None):
     exit()
 
 #Не используется вовсе
+#TODO: убрать
 global d_delay
 d_delay = {}
 def delay(type = "basic"):
@@ -75,6 +76,65 @@ def classify(i, t = 0):
     else:
         return ["выключен", "активен"][h]
 log("Функции загружены!")
+
+#Поиск по списку формата "1,2,3,4"
+def conts(item, cnt):
+    for i in cnt.split(","):
+        if item in i:
+            return True
+    return False
+
+#Поиск по списку формата [1,"2",3,"4"]
+def cont(item, cnt):
+    for i in cnt:
+        if item == i:
+            return True
+    return False
+
+#Получение имени
+import vk
+from json import dumps, loads
+global vkthing, t_names
+vkthing = None #Meh
+
+
+t_names = read("names.cfg")
+if not t_names:
+    t_names = "{}"
+t_names = loads(t_names)
+
+def getname_init(vkth):
+    global vkthing
+    vkthing = vkth
+
+def getname(A):
+    global vkthing, t_names
+    if not str(A) in t_names:
+        while True:
+            if A > 0:
+                try:
+                    temp = vkthing.users.get(user_ids = A)
+                except vk.exceptions.VkAPIError as err:
+                    if err.code == 6:
+                        sleep(1.1)
+                        continue
+                    else:
+                        raise
+                except:
+                    raise
+                temp = temp[0]
+                name = "%s %s"%(temp["first_name"], temp["last_name"])
+            else:
+                name = str(A)
+            t_names[str(A)] = name
+            write("names.cfg", dumps(t_names))
+            log("%s теперь часть нашего сообщества!"%(name))
+            break
+    else:
+        name = t_names[str(A)]
+    return name
+
+
 
 
 #END

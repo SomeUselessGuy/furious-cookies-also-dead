@@ -1,10 +1,14 @@
 #Главный скрипт
+#TODO: заменить мусор на log()
 
 #Импорт сторонних библиотек
 import vk, requests, json
 #Импорт функций из моих библиотек (приложу их в отдельном файле)
-from func import get_token, stop, log, get_randid as randid
+from func import get_token, stop, log, get_randid as randid, getname_init
+#Импортируем ядро сообщений
 import main_messages as mcore
+#Импортируем библиотеку пользователей
+import userdata as user
 
 #Получение токена
 global token
@@ -22,19 +26,21 @@ vk_api = vk.API(vk_session, access_token = token, v = 5.103)
 eth_session = requests.Session()
 
 #Проверка на валидность токена
-#vk.exceptions.VkAPIError - TOCHECK
 try: 
-    data = vk_api.groups.getById()[0] #Получаем информацию о текущем токене.
-    mcore.initialize(data) #Передаем в ядро сообщений данные о боте
+    data = vk_api.groups.getById()[0]   #Получаем информацию о текущем токене.
+                                        #Неверный токен - выдаст ошибку
+    mcore.initialize(data, vk_api) #Передаем в ядро сообщений данные о боте
+    getname_init(vk_api) #ИИИИИИИнициализируем получение имени
     log("Получен доступ от имени %s!"%(data["name"])) #Уведомляем хоста об успешном получении данных
 except vk.exceptions.VkAPIError as err: #Если токен не валидный
     if err.is_access_token_incorrect() or err.code == vk.exceptions.AUTHORIZATION_FAILED:
         log("Неверный токен!")
     else:
         log("Неизвестная ошибка!")
-    stop(err.message)
+    raise
 except: #Если что-то еще (нет функции log, mcore не инициализирован, тд)
-    stop("Неизвестная ошибка!")
+    log("Неизвестная ошибка!")
+    raise
 log("Проверка... пройдена?")
 #BOTS
 longpoll = key = ts = False #Обнуляем данные
@@ -91,7 +97,17 @@ while True: #Запускаем бесконечный цикл
                         if resp.action == "send": #Если нужно отправить сообщение
                             vk_api.messages.send(peer_id = target, message = resp.response, random_id = randid())
                         elif resp.action == "remove": #Если нужно удалить участника беседы
-                            vk_api.messages.removeChatUser(chat_id = target, member_id = resp)
+                            try:
+                                vk_api.messages.removeChatUser(chat_id = target - 2000000000, member_id = resp.response)
+                            except vk.exceptions.VkAPIError as err:
+                                if err.code == 100:
+                                    log("Что-то пошло не так - где-то мы пролюбили передачу беседы")
+                                elif err.code == 15:
+                                    mcore.operator(target, "У беседы, в которой вы являетесь оператором, включена опция кика людей, но нет админки. Исправьте это недоразумение в настройках либо бота, либо беседы.\nЭто сообщение может возникать также в том случае, если бот пытается кикнуть администратора. Игнорируйте подобные случаи.\nЦель: @id%s"%(resp.response))
+                            except: #TODO: исправить это
+                                raise
+
+                                
 
 
 
