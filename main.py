@@ -22,6 +22,11 @@ if not token:
 vk_session = vk.Session()
 vk_api = vk.API(vk_session, access_token = token, v = 5.103)
 
+#from generators import gen_intro
+#vk_api.messages.send(peer_id = 2000000005, message = "Прошу прощения, бот немного умер. Переотправлю вручную", random_id = randid())
+#vk_api.messages.send(peer_id = 2000000005, message = gen_intro, random_id = randid())
+
+
 #Создание сессии... интернета?
 eth_session = requests.Session()
 
@@ -53,8 +58,8 @@ while True: #Запускаем бесконечный цикл
                 stop("Нет доступа.\n%s"%(err.message))
             else:
                 stop("Неожиданная ошибка!\n%s"%(err.message))
-        except:
-            stop("Неизвестная ошибка!")
+        except Exception as err:
+            stop("Неизвестная ошибка! %s"%(str(err)))
         #Определяем ts, key и ссылку на лонгпулл
         ts = loc_a['ts']
         key = loc_a['key']
@@ -95,7 +100,14 @@ while True: #Запускаем бесконечный цикл
                         if not target: #Чиним цель в случае ее отсутствия
                             target = msg["peer_id"]
                         if resp.action == "send": #Если нужно отправить сообщение
-                            vk_api.messages.send(peer_id = target, message = resp.response, random_id = randid())
+                            while True:
+                                try:
+                                    vk_api.messages.send(peer_id = target, message = resp.response, random_id = randid())
+                                    break
+                                except vk.exceptions.VkAPIError:
+                                    break
+                                except:
+                                    continue
                         elif resp.action == "remove": #Если нужно удалить участника беседы
                             try:
                                 vk_api.messages.removeChatUser(chat_id = target - 2000000000, member_id = resp.response)

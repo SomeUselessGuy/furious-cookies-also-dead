@@ -67,7 +67,7 @@ def addpoints(ad, count): #ДАТЬ ПОИНТЫ И ПЕЧЕНЬКИ!
 
 def removepoints(ad, count): #ОТЖАТЬ ПЕЧЕНЬКИ
     d = getdata(ad)
+    d["cookies"] += count / 5 #Печеньки ОТБЕРУ К ЧЕРТЯМ
     upd(ad, d)
-    d["cookies"] -= count / 5 #Печеньки ОТБЕРУ К ЧЕРТЯМ
 
 
